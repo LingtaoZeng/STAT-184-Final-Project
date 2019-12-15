@@ -1,0 +1,217 @@
+---
+title: 'Final Project'
+author: "Lingtao Zeng"
+date: "Due December 17, 2019"
+output:  html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+library(devtools)
+library(mosaic)
+library(tidyverse)
+library(DataComputing)
+```
+### Background Information
+The world is a rapidly changing place. Among the fastest changing aspects are those relating to how people communicate and interact with each other. Finding that each country’s life circumstances, including the social context and political institutions were such important sources to better understand people’s living environment among different region.
+
+### Main purpose of Project
+I want to find out three main things during the analyze 
+1. Which part of the world are most/least happy?
+2. What aspects affect the differences of happiness among countries?
+3. Which country have greatest improve in ranking and which attribute impove most?
+
+
+```{r}
+# import data
+Happy1 <- read.csv("/Users/Lucius/Desktop/2019.csv")
+
+Happy2<-read.csv("/Users/Lucius/Desktop/2018.csv")
+
+```
+### question 1
+#To figure out the answear of first question, I would like to show the most happy and least happy countries then visulize data as world map. 
+```{r}
+Happy1%>%
+  select(Country.or.region,Score)%>%
+  arrange(desc(Score))%>%
+  head(15)
+```
+```{r}
+Happy2%>%
+  select(Country.or.region,Score)%>%
+  arrange(desc(Score))%>%
+  head(15)
+```
+From the first table(2019), in the top 15 most happy countries, 10 countries from Europe, 2 countries from oceania, 1 country from Asia,1 country from North America and 1 country from Central America.
+Scecond table(2018), in the top 15 most happy countries, 11 countries from Europe, 2 countries from oceania,1 country from North America and 1 country from Central America.
+```{r}
+Happy1%>%
+  select(Country.or.region,Score)%>%
+  arrange(order(Score))%>%
+  head(15)
+
+```
+
+```{r}
+Happy2%>%
+  select(Country.or.region,Score)%>%
+  arrange(order(Score))%>%
+  head(15)
+```
+
+From the first table(2019), in the top 15 least happy countries, 10 countries from Africa, 4 country from Asia,1 country from North America.
+From the first table(2018), in the top 15 least happy countries, there are also 10 countries from Africa, 4 country from Asia,1 country from North America.
+```{r}
+Happy1%>%
+WorldMap(key="Country.or.region", fill=Score)
+```
+From the world map we can see that North America have high happiniess score and Africa have low happniess score. This result matches two tables that I showed above. 
+So the most happy are in earth is Euorpe and least happy area is Africa.
+
+### Question 2 
+##What aspects affect the differences of happiness among countries?
+First of all, lets figure out all attributes in the dataset and list it.
+1. GDP per capital
+2. Social support
+3. Healthy life expandency
+4. Freedom to make life choice
+5. generosity
+6. corruption
+
+
+### GDP per Capital
+```{r}
+ggplot(data=Happy1,aes(x=Overall.rank,y=GDP.per.capita))+geom_point()+aes(colour=GDP.per.capita)+aes(size=GDP.per.capita) + geom_smooth(method=lm) 
+
+ggplot(data=Happy2,aes(x=Overall.rank,y=GDP.per.capita))+geom_point()+aes(colour=GDP.per.capita)+aes(size=GDP.per.capita) + geom_smooth(method=lm) 
+```
+
+
+According to both of two tables, GDP per capital and Overall.rank have negative relationship, the lower the GDP per capital, the rank is higher(less happy).
+
+###Socail support
+```{r}
+ggplot(data=Happy1,aes(x=Overall.rank,y=Social.support))+geom_point() + geom_smooth(method=lm) 
+ggplot(data=Happy2,aes(x=Overall.rank,y=Social.support))+geom_point() + geom_smooth(method=lm)
+```
+
+Like the GDP, social support and Overall.rank have negative relationship,lower the social support, the rank is higher(less happy).
+
+###Healthy life expandency
+```{r}
+ggplot(data=Happy1,aes(x=Overall.rank,y=Healthy.life.expectancy))+geom_point() + geom_smooth(method=lm)
+ggplot(data=Happy2,aes(x=Overall.rank,y=Healthy.life.expectancy))+geom_point() + geom_smooth(method=lm)
+```
+Health life expandency and Overall.rank have negative relationship,lower the social support, the rank is higher(less happy).
+
+###Freedom to make life choice
+```{r}
+ggplot(data=Happy1,aes(x=Overall.rank,y=Freedom.to.make.life.choices))+geom_point() + geom_smooth(method=lm)
+ggplot(data=Happy2,aes(x=Overall.rank,y=Freedom.to.make.life.choices))+geom_point() + geom_smooth(method=lm)
+```
+Health life expandency and Overall.rank have negative relationship according to the linear in the grapth,lower the social support, the rank is higher(less happy).
+
+### Generosity
+```{r}
+ggplot(data=Happy1,aes(x=Overall.rank,y=Generosity))+geom_point()+aes(colour=Generosity) + geom_smooth(method=loess)
+ggplot(data=Happy2,aes(x=Overall.rank,y=Generosity))+geom_point()+aes(colour=Generosity) + geom_smooth(method=loess) 
+```
+It is clear that generosity don't have solid relationship with the overall rank so I would like to try bar graph to see more clear.
+```{r}
+ggplot(data=Happy1,aes(x=Overall.rank,y=Generosity ))+geom_bar(stat='identity',position='stack', width=.9)
+ggplot(data=Happy2,aes(x=Overall.rank,y=Generosity ))+geom_bar(stat='identity',position='stack', width=.9)
+```
+So, the generocity do not have big impact on overall rank.
+
+### perception of corruption
+```{r}
+ggplot(data=Happy1,aes(x=Overall.rank,y=Perceptions.of.corruption))+geom_point()+scale_x_log10() + geom_smooth(method=lm) 
+ggplot(data=Happy1,aes(x=Overall.rank,y=Perceptions.of.corruption))+geom_point()+scale_x_log10() + geom_smooth(method=lm)
+```
+Perception of corruption and Overall.rank have negative relationship according to the linear in the grapth,lower the social support, the rank is higher(less happy).
+
+### Question 3
+After we find the relationship between 6 attributes and rank, I want to figure out which country improve most in past year.
+```{r}
+  Happy1%>%
+  mutate(rank1=Overall.rank,Country=Country.or.region)%>%
+  select(Country,rank1)%>%
+  left_join(Happy2%>%
+              select(Country.or.region,Overall.rank),by=c("Country"="Country.or.region"))%>%
+  mutate(comparerank=Overall.rank-rank1)%>%
+  arrange(desc(comparerank))
+
+```
+According to the table above, Benin is most improve country over past year. Benin improve 34 levels.
+
+### Benin 's background information
+Benin, officially the Republic of Beninand formerly Dahomey, is a country in West Africa. It is bordered by Togo to the west, Nigeria to the east, and Burkina Faso and Niger to the north. The majority of its population lives on the small southern coastline of the Bight of Benin, part of the Gulf of Guinea in the northernmost tropical portion of the Atlantic Ocean. The capital of Benin is Porto-Novo, but the seat of government is in Cotonou, the country's largest city and economic capital. Benin covers an area of 114,763 square kilometres (44,310 sq mi) and its population in 2018 was estimated to be approximately 11.49 million. Benin is a tropical nation, highly dependent on agriculture, and is a large exporter of cotton and palm oil. Substantial employment and income arise from subsistence farming.
+
+### What happend in Benin
+```{r}
+Happy1%>%
+  filter(Country.or.region=="Benin")
+
+```
+```{r}
+Happy2%>%
+  filter(grepl("Benin", Country.or.region, ignore.case = TRUE)) 
+  
+```
+
+```{r}
+#mutate data
+HP2019<- Happy1%>%
+  mutate(Country=Country.or.region,GDP1=GDP.per.capita,SS1=Social.support,HL1=Healthy.life.expectancy,FREE1=Freedom.to.make.life.choices,GE1=Generosity,POF1=Perceptions.of.corruption)%>%
+  filter(Country=="Benin")%>%
+  select(Country,GDP1,SS1,HL1,FREE1,GE1,POF1)
+
+HP2018<- Happy2%>%
+  mutate(GDP2=GDP.per.capita,SS2=Social.support,HL2=Healthy.life.expectancy,FREE2=Freedom.to.make.life.choices,GE2=Generosity,POF2=Perceptions.of.corruption)%>%
+    filter(Country.or.region=="Benin")%>%
+  select(Country.or.region,GDP2,SS2,HL2,FREE2,GE2,POF2)
+```
+```{r}
+HP2019
+```
+```{r}
+HP2018
+```
+
+### Which attribute improve most
+```{r}
+#define function
+calculate=function(x,y){
+  improve=(x-y)/y
+  improve=improve*100
+  return(improve)
+}
+
+#calculate GDP
+calculate(0.393,0.378)
+#calculate Social Support
+calculate (0.437,0.372)
+#calculate Health
+calculate(0.397,0.24)
+#calculate Free choice
+calculate(0.349,0.44)
+#calculate Generosity
+calculate(0.175,0.163)
+#calculate corruption
+calculate（0.082，0.067)
+
+```
+
+
+According to two tables above, Benin's 5 attributes GDP per capita, social support, Healthy life expectancy, Generosity and corruption increase easpecially the Healthy life expectancy， it grows 65% in 2018 and that makes Benin's happiniess score higher and improve it's rank from 136 to 102
+
+
+
+
+
+
+
